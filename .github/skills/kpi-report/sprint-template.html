@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASNASt KPI – Sprint {{SPRINT}}</title>
+<style>
+  :root {
+    --bg: #3a3d43;
+    --card: #f3f3f5;
+    --card-hover: #ffffff;
+    --border: rgba(255,255,255,.14);
+    --text: #f4f4f5;
+    --muted: #9a9ca3;
+    --faint: #6b6d74;
+    --red: #e4002b;
+    --green: #3ddc97;
+    --amber: #ffb547;
+    --on-card: #16171a;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { color-scheme: dark; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(1000px 600px at 85% -10%, rgba(228,0,43,.20), transparent 60%),
+      radial-gradient(1000px 600px at 10% 0%, rgba(190,200,220,.28), transparent 60%),
+      linear-gradient(180deg, #4a4d54 0%, var(--bg) 60%, #2f3136 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    line-height: 1.4;
+  }
+  .wrap { max-width: 1560px; margin: 0 auto; padding: 40px 56px 56px; }
+
+  /* Header */
+  header {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 0; padding-bottom: 36px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { height: 22px; display: block; margin: 0 auto 28px; filter: invert(1); mix-blend-mode: screen; }
+  .eyebrow { font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: #c5c7cd; margin-bottom: 10px; }
+  h1 { font-size: 40px; font-weight: 700; letter-spacing: -.01em; }
+  h1 span { color: #ff2a4d; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 24px; }
+  .chip {
+    font-size: 15px; color: #c5c7cd; padding: 10px 18px;
+    border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,.08);
+    white-space: nowrap;
+  }
+  .chip b { color: #fff; font-weight: 700; }
+
+  /* Sections */
+  section { margin-top: 44px; }
+  h2 {
+    font-size: 16px; letter-spacing: .16em; text-transform: uppercase;
+    color: #d6d8dd; font-weight: 700; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  h2::before { content: ""; width: 18px; height: 2px; background: var(--red); }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 22px; }
+  .span-4 { grid-column: span 4; }
+  .span-6 { grid-column: span 6; }
+  .span-12 { grid-column: span 12; }
+
+  /* Cards */
+  .card {
+    position: relative; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 26px 28px;
+    color: var(--on-card); --muted: #62646b; --faint: #7d7f86; --border: rgba(0,0,0,.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,.28);
+    transition: background .2s, transform .2s, box-shadow .2s;
+  }
+  .card:hover { background: var(--card-hover); transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,.36); }
+  .card.hero { border-top: 4px solid var(--red); }
+  .label { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+  .label em { font-style: normal; color: var(--red); margin-right: 8px; }
+  .value { font-size: 68px; font-weight: 700; letter-spacing: -.03em; margin: 16px 0 8px; line-height: 1; display: flex; align-items: baseline; gap: 10px; }
+  .value small { font-size: 19px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+  .detail { font-size: 16px; color: #3d3f45; }
+  .detail strong { color: var(--on-card); }
+
+  /* Badges */
+  .badge { display: inline-block; font-size: 14px; font-weight: 700; padding: 5px 12px; border-radius: 999px; margin-left: 4px; vertical-align: middle; letter-spacing: 0; }
+  .badge.good { background: rgba(20,160,100,.14); color: #0c8a55; }
+  .badge.warn { background: rgba(230,140,0,.16); color: #b36b00; }
+
+  /* Progress */
+  .bar { height: 10px; border-radius: 999px; background: rgba(0,0,0,.09); margin-top: 22px; overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8f001b, var(--red)); }
+  .bar i.ok { background: linear-gradient(90deg, #1f9d6b, var(--green)); }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 14px; color: var(--muted); margin-top: 8px; }
+
+  /* Info tooltip */
+  .info {
+    position: relative; width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,.25); color: var(--muted); font-size: 14px; font-style: normal;
+    display: inline-flex; align-items: center; justify-content: center; cursor: help; flex: none;
+    letter-spacing: 0; text-transform: none;
+  }
+  .info:hover, .info:focus { color: #fff; background: var(--on-card); outline: none; }
+  .info .tip {
+    position: absolute; right: -8px; top: 36px; width: 320px; z-index: 10;
+    background: #1b1c20; border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+    padding: 14px 16px; font-size: 14px; line-height: 1.5; color: #e4e5e8; text-align: left; font-weight: 400; text-transform: none;
+    box-shadow: 0 12px 32px rgba(0,0,0,.5);
+    opacity: 0; visibility: hidden; transform: translateY(-4px); transition: .15s;
+  }
+  .info:hover .tip, .info:focus .tip { opacity: 1; visibility: visible; transform: none; }
+
+  /* Review split */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 6px; }
+  .split > div + div { border-left: 1px solid var(--border); padding-left: 32px; }
+  .split .value { font-size: 60px; }
+  .split .title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.recon { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--faint); line-height: 1.5; }
+.recon strong { color: #3d3f45; }
+  .tlist { list-style: none; margin: 14px 0 0; padding: 10px 0 0; border-top: 1px solid var(--border); font-size: 11px; line-height: 1.6; color: var(--faint); }
+  .tlist a { color: inherit; font-weight: 600; text-decoration: none; border-bottom: 1px dotted currentColor; }
+  .tlist .sp { white-space: nowrap; }
+
+  footer {
+    margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: 13px; color: #b5b7be;
+  }
+
+  @media (max-width: 980px) {
+    .span-4, .span-6 { grid-column: span 12; }
+    .wrap { padding: 24px 20px 40px; }
+    h1 { font-size: 30px; }
+    .value, .split .value { font-size: 52px; }
+    .split { grid-template-columns: 1fr; gap: 20px; }
+    .split > div + div { border-left: 0; padding-left: 0; border-top: 1px solid var(--border); padding-top: 20px; }
+  }
+  @media (min-width: 981px) and (max-width: 1100px) { .span-4 { grid-column: span 6; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <img class="logo" src="{{LOGO}}" alt="Porsche">
+      <div class="eyebrow">Sprint Level Report</div>
+      <h1>ASNASt KPI <span>Sprint {{SPRINT}}</span></h1>
+    </div>
+    <div class="chips">
+      <div class="chip">Sprint <b>{{SPRINT}}</b> ({{PI}})</div>
+      <div class="chip">Sprint name <b>{{SPNAME}}</b></div>
+      <div class="chip"><b>{{RANGE}}</b></div><div class="chip">Status <b>{{STATE}}</b></div>
+    </div>
+  </header>
+
+  <section>
+    <h2>Delivery, commitment &amp; flow of the sprint</h2>
+    <div class="grid">
+
+      <article class="card hero span-4">
+        <div class="label"><span><em>S-KPI 1</em>Delivered</span>
+          <span class="info" tabindex="0">i<span class="tip">Reached Technical Review within the sprint period; all types with Original SP &gt; 0; Won't Do and Sub-tasks excluded.</span></span></div>
+        <div class="value">{{DEL_SP}} <small>SP</small></div>
+        <div class="detail"><strong>{{DEL_T}} tickets</strong> · {{DEL_TYPES}}</div>
+      </article>
+
+      <article class="card hero span-4">
+        <div class="label"><span><em>S-KPI 2</em>Velocity</span>
+          <span class="info" tabindex="0">i<span class="tip">Capacity from the team capacity Excel (input only).</span></span></div>
+        <div class="value">{{VELOCITY}}</div>
+        <div class="detail">Delivered SP / <strong>{{CAPACITY}}</strong> planned person days</div>
+      </article>
+
+      <article class="card hero span-4">
+        <div class="label"><span><em>S-KPI 3</em>Delivered / Committed</span>
+          <span class="info" tabindex="0">i<span class="tip">Ratio = Delivered SP / Committed SP, 2 decimals. Committed = Original SP (latest value) of the issues assigned to the sprint at sprint start, excluding issues that already reached Technical Review before the sprint started; one value used in all KPIs.</span></span></div>
+        <div class="value">{{RATIO}} {{RATIO_BADGE}}</div>
+        <div class="detail">Committed <strong>{{COMMITTED}} SP</strong> · Delivered <strong>{{DEL_SP}} SP</strong></div>
+        <div class="bar"><i class="ok" style="width:{{RATIO_BAR}}%"></i></div>
+        <div class="bar-meta"><span>0</span><span>{{RATIO_TEXT}}</span></div>
+      </article>
+
+      <article class="card span-6">
+        <div class="label"><span><em>S-KPI 4</em>Leftovers</span>
+          <span class="info" tabindex="0">i<span class="tip">Leftovers = assigned to the sprint at sprint end (start of the next sprint) without Technical Review. Note: this does not mean they are all carried over into the next sprint; e.g. a ticket can reach Technical Review shortly after the cut-off or be moved elsewhere.</span></span></div>
+        <div class="value">{{LEFT_T}} <small>tickets</small> {{LEFT_BADGE}}</div>
+        <div class="detail"><strong>{{LEFT_SP}} SP</strong> · {{LEFT_TYPES}}</div>
+        {{LEFT_LIST}}
+      </article>
+
+      <article class="card span-6">
+        <div class="label"><span><em>S-KPI 4</em>Added after start</span>
+          <span class="info" tabindex="0">i<span class="tip">Added = first assigned to the sprint after sprint start. SP = Original SP (latest value).</span></span></div>
+        <div class="value">{{ADD_T}} <small>tickets</small></div>
+        <div class="detail"><strong>{{ADD_SP}} SP</strong> · {{ADD_TYPES}}</div>
+        {{ADD_LIST}}
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Technical Review</h2>
+    <article class="card span-12">
+      <div class="label"><span><em>S-KPI 5</em>Technical Review Rate</span>
+        <span class="info" tabindex="0">i<span class="tip">Planned = assigned at sprint start; added = first assigned after sprint start. Shown: how many of each group reached Technical Review during the sprint period (SP = Original SP, latest value). Planned tickets that did not reach Technical Review are not automatically leftovers or carried over into the next sprint.</span></span></div>
+      <div class="split">
+        <div>
+          <div class="value">{{PLAN_TR}} <small>/ {{PLAN_N}}</small></div>
+          <div class="title">Planned reached Technical Review</div>
+          <div class="detail">{{PLAN_TYPES}} · <strong>{{PLAN_SP}} SP</strong></div>
+          <div class="bar"><i style="width:{{PLAN_PCT}}%"></i></div>
+          <div class="bar-meta"><span>{{PLAN_PCT}} %</span><span>{{PLAN_N}}</span></div>
+        </div>
+        <div>
+          <div class="value">{{ADD_TR}} <small>/ {{ADD_N}}</small></div>
+          <div class="title">Added reached Technical Review</div>
+          <div class="detail">{{ADD_TYPES2}} · <strong>{{ADD_TRSP}} SP</strong></div>
+          <div class="bar"><i style="width:{{ADD_PCT}}%"></i></div>
+          <div class="bar-meta"><span>{{ADD_PCT}} %</span><span>{{ADD_N}}</span></div>
+        </div>
+      </div>
+      <p class="recon">Reconciliation with Delivered (S-KPI 1): Planned {{PLAN_TR}} + Added {{ADD_TR}} + Other {{OTH_N}} = <strong>{{DEL_T}} tickets</strong> &middot; {{PLAN_SP}} + {{ADD_TRSP}} + {{OTH_SP}} = <strong>{{DEL_SP}} SP</strong>. Other = reached Technical Review in the sprint period, but was neither assigned at sprint start nor added after it.</p>
+    </article>
+  </section>
+
+  <footer>
+    <span>AI-driven analyzed · Source: Jira ASDM / ASNAST · generated {{DATE}}</span>
+    <span>Each figure is computed once and reused identically</span>
+  </footer>
+
+</div>
+</body>
+</html>

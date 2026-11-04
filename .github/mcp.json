@@ -1,0 +1,66 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "type": "local",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "tools": [
+        "*"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "tools": [
+        "*"
+      ]
+    },
+    "mcp-atlassian": {
+      "command": "podman",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--env-file",
+        ".env",
+        "-e",
+        "CONFLUENCE_URL=https://api.skyway.porsche.com/confluence",
+        "-e",
+        "JIRA_URL=https://api.skyway.porsche.com/jira",
+        "-e",
+        "TRANSPORT=stdio",
+        "-e",
+        "HTTP_PROXY=http://http-proxy.porsche.org:3133",
+        "-e",
+        "HTTPS_PROXY=http://http-proxy.porsche.org:3133",
+        "ghcr.io/sooperset/mcp-atlassian:latest"
+      ],
+      "env": {
+        "CONFLUENCE_PERSONAL_TOKEN": "$CONFLUENCE_PERSONAL_TOKEN",
+        "JIRA_PERSONAL_TOKEN": "$JIRA_PERSONAL_TOKEN"
+      },
+      "tools": [
+        "*"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "$GITHUB_PERSONAL_ACCESS_TOKEN"
+      },
+      "tools": [
+        "*"
+      ]
+    }
+  }
+}
