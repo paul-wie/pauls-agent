@@ -43,7 +43,7 @@ function WD($a,$b){ if($b -le $a){return 0.0}; $t=0.0;$d=$a
  while($d -lt $b){ $n=[datetimeoffset]::new($d.Date.AddDays(1),$d.Offset); if($n -gt $b){$n=$b}
   if($d.DayOfWeek -ne 'Saturday' -and $d.DayOfWeek -ne 'Sunday'){$t+=($n-$d).TotalDays}; $d=$n }
  $t }
-function TT($rows,$prop){ @($rows|group type|sort Name|%{ $g=@($_.Group); "$($_.Name) $(@($g|?{$_.$prop}).Count)/$($g.Count)" }) -join ', ' }
+function TT($rows,$prop){ @($rows|group type|Sort-Object Name|%{ $g=@($_.Group); "$($_.Name) $(@($g|?{$_.$prop}).Count)/$($g.Count)" }) -join ', ' }
 function Avg($a){ $a=@($a); if($a.Count -eq 0){return $null}; ($a|Measure-Object -Average).Average }
 function Sum($a){ $a=@($a); if($a.Count -eq 0){return 0}; ($a|Measure-Object -Sum).Sum }
 function F($x,$d=1){ if($null -eq $x){return 'n/a'}; ([math]::Round([double]$x,$d,[MidpointRounding]::AwayFromZero)).ToString("F$d",$IC).Replace('.',',') }
@@ -70,11 +70,11 @@ function SprintKpi($s){
  $d=@($rows|?{$_.deliv}); $p=@($rows|?{$_.planned}); $a=@($rows|?{$_.added}); $l=@($rows|?{$_.left})
  $cap=$CAP[$s.key]; $dsp=Sum ($d|%{$_.sp}); $com=Sum ($p|%{$_.spAct})
  [pscustomobject]@{sprint=$s.key;name=$s.name;state=$s.state;start=$start;activated=$act;end=$end
-  deliveredTickets=$d.Count;deliveredSP=$dsp;deliveredByType=@($d|group type|sort Name|%{"$($_.Name) $($_.Count)"})
+  deliveredTickets=$d.Count;deliveredSP=$dsp;deliveredByType=@($d|group type|Sort-Object Name|%{"$($_.Name) $($_.Count)"})
   committedSP=$com;plannedTickets=$p.Count;plannedTR=@($p|?{$_.deliv}).Count;plannedTypes=(TT $p 'deliv');addedTRTypes=(TT $a 'deliv');addedTRSP=(Sum ($a|?{$_.deliv}|%{$_.sp}));plannedTRSP=(Sum ($p|?{$_.deliv}|%{$_.sp}));otherTickets=@($rows|?{$_.deliv -and -not $_.planned -and -not $_.added}).Count;otherSP=(Sum ($rows|?{$_.deliv -and -not $_.planned -and -not $_.added}|%{$_.sp}))
-  addedTickets=$a.Count;addedSP=(Sum ($a|%{$_.maxsp}));addedTR=@($a|?{$_.deliv}).Count;addedTypes=@($a|group type|sort Name|%{"$($_.Name) $($_.Count)"})
-  leftTickets=$(if($running){$null}else{$l.Count});leftSP=$(if($running){$null}else{Sum ($l|%{$_.maxsp})});leftTypes=@($l|group type|sort Name|%{"$($_.Name) $($_.Count)"})
-  addedList=@($a|sort key|%{[ordered]@{key=$_.key;title=$_.title;sp=$_.maxsp}});leftList=$(if($running){$null}else{@($l|sort key|%{[ordered]@{key=$_.key;title=$_.title;sp=$_.maxsp}})})
+  addedTickets=$a.Count;addedSP=(Sum ($a|%{$_.maxsp}));addedTR=@($a|?{$_.deliv}).Count;addedTypes=@($a|group type|Sort-Object Name|%{"$($_.Name) $($_.Count)"})
+  leftTickets=$(if($running){$null}else{$l.Count});leftSP=$(if($running){$null}else{Sum ($l|%{$_.maxsp})});leftTypes=@($l|group type|Sort-Object Name|%{"$($_.Name) $($_.Count)"})
+  addedList=@($a|Sort-Object key|%{[ordered]@{key=$_.key;title=$_.title;sp=$_.maxsp}});leftList=$(if($running){$null}else{@($l|Sort-Object key|%{[ordered]@{key=$_.key;title=$_.title;sp=$_.maxsp}})})
   capacity=$cap;planList=@($p|%{"$($_.key)/$($_.type)/$($_.spAct)/o$($_.osp)/b$($_.sp)"});velocity=$(if($cap){$dsp/$cap}else{$null});ratio=$(if($com -gt 0){$dsp/$com}else{$null})} }
 
 # ---- HTML helpers ----
@@ -135,7 +135,7 @@ foreach($f in $feat){ $im=FirstStatus $f.p 'Implementation' $null; $dn=$null; if
  if($im -and $dn){ $unc=@(); if($im.ToString('yyyy-MM-dd HH') -eq '2026-03-03 14'){$unc+='Implementation start = bulk migration'}
   $fk+=[pscustomobject]@{key=$f.p.key;days=($dn-$im).TotalDays;pis=($f.pis -join ', ');unc=($unc -join '; ')} }
  else{ $fo+=[pscustomobject]@{key=$f.p.key;status=$f.p.status;pis=($f.pis -join ', ')} } }
-$res.kpi1=[ordered]@{avgDays=(Avg ($fk|%{$_.days}));n=$fk.Count;features=$feat.Count;computed=@($fk|sort key);notComputable=@($fo|sort key);outliers=@($fk|sort days -Descending|select -First 3)}
+$res.kpi1=[ordered]@{avgDays=(Avg ($fk|%{$_.days}));n=$fk.Count;features=$feat.Count;computed=@($fk|Sort-Object key);notComputable=@($fo|Sort-Object key);outliers=@($fk|Sort-Object days -Descending|select -First 3)}
 
 # PI ticket universe
 $all=@(Search ('project = ASNAST AND sprint in (' + ($ids -join ',') + ')') $FIELDS|%{Prep $_}|?{Elig $_})
@@ -144,12 +144,12 @@ $stories=@($all|?{$_.type -eq 'Story'})
 $bu=@($stories|?{$_.cat -eq 'done'}|%{$_.osp}|?{$_ -gt 0})
 $res.kpi2=[ordered]@{avgSP=(Avg $bu);n=$bu.Count}
 # KPI 3
-$res.kpi3=[ordered]@{total=$all.Count;byType=@($all|group type|sort Name|%{[ordered]@{type=$_.Name;n=$_.Count;pct=($_.Count/$all.Count*100)}})}
+$res.kpi3=[ordered]@{total=$all.Count;byType=@($all|group type|Sort-Object Name|%{[ordered]@{type=$_.Name;n=$_.Count;pct=($_.Count/$all.Count*100)}})}
 # KPI 4
 $ct=@(); foreach($i in $stories){ $rf=FirstStatus $i 'Ready for Dev' $null; if(-not $rf){continue}; $tr=FirstStatus $i 'Technical Review' $rf; if(-not $tr){continue}
  $ip=FirstStatus $i 'In Progress' $rf; $tot=WD $rf $tr; $w=$null;$k2=$null; if($ip -and $ip -le $tr){$w=WD $rf $ip;$k2=$tot-$w}
  $ct+=[pscustomobject]@{key=$i.key;tot=$tot;wait=$w;work=$k2} }
-$res.kpi4=[ordered]@{n=$ct.Count;avgTotal=(Avg ($ct|%{$_.tot}));avgWait=(Avg ($ct|?{$null -ne $_.wait}|%{$_.wait}));avgWork=(Avg ($ct|?{$null -ne $_.work}|%{$_.work}));outliers=@($ct|sort tot -Descending|select -First 5)}
+$res.kpi4=[ordered]@{n=$ct.Count;avgTotal=(Avg ($ct|%{$_.tot}));avgWait=(Avg ($ct|?{$null -ne $_.wait}|%{$_.wait}));avgWork=(Avg ($ct|?{$null -ne $_.work}|%{$_.work}));outliers=@($ct|Sort-Object tot -Descending|select -First 5)}
 # KPI 5
 $add=@();$pull=@()
 foreach($i in @($all|?{$_.type -in 'Story','Bug'})){ $fa=FirstAssign $i $ids; if(-not $fa -or $fa -le $cut){continue}
@@ -161,7 +161,7 @@ $sp0=@($all|?{$_.osp -gt 0}); $r6=@()
 foreach($i in $sp0){ $fa=FirstAssign $i $ids; if(-not $fa){continue}; $tr=FirstStatus $i 'Technical Review' $null; if($tr -and $tr -lt $piStart){continue}
  $r6+=[pscustomobject]@{type=$i.type;sp=$i.osp;burned=$i.osp;maxsp=$i.osp;planned=($fa -le $cut);tr=[bool]($tr -and $tr -ge $piStart -and $tr -lt $piEnd);left=((@(SprintsAt $i $piEnd|?{$ids -contains $_}).Count -gt 0) -and -not ($tr -and $tr -le $piEnd))} }
  $pl=@($r6|?{$_.planned}); $ad=@($r6|?{-not $_.planned}); $dl=@($r6|?{$_.tr}); $lf=@($r6|?{$_.left})
- $res.overview=[ordered]@{deliveredTickets=$dl.Count;deliveredSP=(Sum ($dl|%{$_.burned}));deliveredTypes=@($dl|group type|sort Name|%{"$($_.Name) $($_.Count)"}) -join ', ';leftTickets=$lf.Count;leftSP=(Sum ($lf|%{$_.maxsp}));leftTypes=@($lf|group type|sort Name|%{"$($_.Name) $($_.Count)"}) -join ', ';addedTickets=$ad.Count;addedSP=(Sum ($ad|%{$_.maxsp}));addedTypes=@($ad|group type|sort Name|%{"$($_.Name) $($_.Count)"}) -join ', '}
+ $res.overview=[ordered]@{deliveredTickets=$dl.Count;deliveredSP=(Sum ($dl|%{$_.burned}));deliveredTypes=@($dl|group type|Sort-Object Name|%{"$($_.Name) $($_.Count)"}) -join ', ';leftTickets=$lf.Count;leftSP=(Sum ($lf|%{$_.maxsp}));leftTypes=@($lf|group type|Sort-Object Name|%{"$($_.Name) $($_.Count)"}) -join ', ';addedTickets=$ad.Count;addedSP=(Sum ($ad|%{$_.maxsp}));addedTypes=@($ad|group type|Sort-Object Name|%{"$($_.Name) $($_.Count)"}) -join ', '}
 $res.kpi6=[ordered]@{planned=$pl.Count;plannedTypes=(TT $pl 'tr');addedTypes=(TT $ad 'tr');plannedSP=(Sum ($pl|%{$_.sp}));plannedTR=@($pl|?{$_.tr}).Count;plannedTRSP=(Sum ($pl|?{$_.tr}|%{$_.sp}));added=$ad.Count;addedSP=(Sum ($ad|%{$_.sp}));addedTR=@($ad|?{$_.tr}).Count;addedTRSP=(Sum ($ad|?{$_.tr}|%{$_.sp}))}
 # KPI 7 per sprint
 $sk=@($ps|%{SprintKpi $_})
