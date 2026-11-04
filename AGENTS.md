@@ -12,7 +12,7 @@ Persoenliches Arbeits-Repo fuer KPI-Reports und Ad-hoc-Fragen zu **ASNAST** (Sto
 - Jira und Confluence erreicht man nur im Firmennetz/VPN ueber den Proxy `http://http-proxy.porsche.org:3133`.
 - Jira: `https://api.skyway.porsche.com/jira` (Board 114224, Original SP = `customfield_10500`, Sprint = `customfield_10004`).
 - Confluence: `https://api.skyway.porsche.com/confluence`.
-- MCP-Server (`.github/mcp.json`): mcp-atlassian (Jira + Confluence), github, context7, sequential-thinking.
+- MCP-Server (`.github/mcp.template.json`, generated to `.github/mcp.json` by the start scripts): mcp-atlassian (Jira + Confluence), github, context7, sequential-thinking.
 
 ## Sicherheitsregeln
 - Jira ist standardmaessig **nur lesend**. Schreibzugriffe (Tickets aendern, Sprints bearbeiten) nur nach ausdruecklicher Anweisung. Sprints nie direkt per MCP bearbeiten.

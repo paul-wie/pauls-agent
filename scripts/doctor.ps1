@@ -16,16 +16,18 @@ foreach ($v in 'JIRA_PERSONAL_TOKEN', 'CONFLUENCE_PERSONAL_TOKEN') {
 }
 if ($env:GITHUB_PERSONAL_ACCESS_TOKEN) { Ok 'GITHUB_PERSONAL_ACCESS_TOKEN loaded' } else { Warn 'GITHUB_PERSONAL_ACCESS_TOKEN not set (optional)' }
 
-if (Get-Command podman -ErrorAction SilentlyContinue) {
-  Ok 'podman found'
-  podman info *> $null
-  if ($LASTEXITCODE -eq 0) { Ok 'podman engine reachable' } else { Bad 'podman installed but engine not reachable (podman machine start)' }
-} else { Bad 'podman not found on PATH' }
+if ($env:PASS_CONTAINER_RUNTIME) { $runtime = $env:PASS_CONTAINER_RUNTIME }
+else { $runtime = foreach ($r in 'podman', 'docker') { if (Get-Command $r -ErrorAction SilentlyContinue) { $r; break } } }
+if ($runtime -and (Get-Command $runtime -ErrorAction SilentlyContinue)) {
+  Ok "$runtime found"
+  & $runtime info *> $null
+  if ($LASTEXITCODE -eq 0) { Ok "$runtime engine reachable" } else { Bad "$runtime installed but engine not reachable (start Docker Desktop / podman machine)" }
+} else { Bad 'neither podman nor docker found on PATH' }
 
 if (Get-Command node -ErrorAction SilentlyContinue) { Ok "node found ($(node --version))" } else { Bad 'node not found (needed for npx MCP servers)' }
 if (Get-Command copilot -ErrorAction SilentlyContinue) { Ok 'copilot found' } else { Bad 'copilot not found on PATH' }
 
 $mcp = Join-Path $root '.github\mcp.json'
-try { $null = Get-Content $mcp -Raw | ConvertFrom-Json; Ok '.github/mcp.json is valid JSON' } catch { Bad '.github/mcp.json missing or invalid' }
+try { $null = Get-Content $mcp -Raw | ConvertFrom-Json; Ok '.github/mcp.json is valid JSON' } catch { Warn '.github/mcp.json not generated yet (created by start.ps1 / start.sh)' }
 
 if ($fail) { Write-Host "`n$fail check(s) failed." -ForegroundColor Red; exit 1 } else { Write-Host "`nAll checks passed." -ForegroundColor Green }

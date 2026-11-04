@@ -78,7 +78,7 @@ function SprintKpi($s){
   capacity=$cap;planList=@($p|%{"$($_.key)/$($_.type)/$($_.spAct)/o$($_.osp)/b$($_.sp)"});velocity=$(if($cap){$dsp/$cap}else{$null});ratio=$(if($com -gt 0){$dsp/$com}else{$null})} }
 
 # ---- HTML helpers ----
-$logoFile=Join-Path $PSScriptRoot 'assets\logo.jpg'
+$logoFile=Join-Path (Join-Path $PSScriptRoot 'assets') 'logo.jpg'
 $logoUri=$(if(Test-Path $logoFile){"data:image/jpeg;base64,$([Convert]::ToBase64String([IO.File]::ReadAllBytes($logoFile)))"}else{''})
 
 if($Level -eq 'sprint'){
@@ -111,7 +111,7 @@ if($Level -eq 'sprint'){
   ADD_T=$k.addedTickets;ADD_SP=(F $k.addedSP 0);ADD_TYPES=(& $ty $k.addedTypes)
   PLAN_TR=$k.plannedTR;PLAN_N=$k.plannedTickets;PLAN_TYPES=$k.plannedTypes;PLAN_SP=(F $k.plannedTRSP 0);PLAN_PCT=(& $pct $k.plannedTR $k.plannedTickets)
   ADD_TR=$k.addedTR;ADD_N=$k.addedTickets;ADD_TYPES2=$k.addedTRTypes;ADD_TRSP=(F $k.addedTRSP 0);ADD_PCT=(& $pct $k.addedTR $k.addedTickets);OTH_N=$k.otherTickets;OTH_SP=(F $k.otherSP 0) }
- $hs=@{}; Get-Content (Join-Path $PSScriptRoot 'design-final\hashes.txt')|%{ $p=$_ -split '=',2; $hs[$p[0]]=$p[1] }
+ $hs=@{}; Get-Content (Join-Path (Join-Path $PSScriptRoot 'design-final') 'hashes.txt')|%{ $p=$_ -split '=',2; $hs[$p[0]]=$p[1] }
  if((Get-FileHash (Join-Path $PSScriptRoot 'sprint-template.html') -Algorithm SHA256).Hash -ne $hs['template'] -or (Get-FileHash $logoFile -Algorithm SHA256).Hash -ne $hs['logo']){ throw "Sprint design changed: sprint-template.html / assets\logo.jpg differ from the approved design in design-final\. Restore from design-final\*.FINAL.* or, if the change is intended, update design-final\hashes.txt." }
  $html=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'sprint-template.html'),[Text.Encoding]::UTF8)
  foreach($key in $map.Keys){ $html=$html.Replace("{{$key}}","$($map[$key])") }
@@ -198,7 +198,7 @@ $pmap=[ordered]@{
  K5_STORIES=$k5.addedStories;K5_SP=(F $k5.addedStorySP 0);K5_BUGS=$k5.addedBugs;K5_PULLED=$k5.pulledStories;K5_PULLEDSP=(F $k5.pulledStorySP 0)
  K6_PTR=$k6.plannedTR;K6_P=$k6.planned;K6_PTRSP=(F $k6.plannedTRSP 0);K6_PSP=(F $k6.plannedSP 0);K6_ATR=$k6.addedTR;K6_A=$k6.added;K6_ATRSP=(F $k6.addedTRSP 0);K6_ASP=(F $k6.addedSP 0)
  CHART=$chart }
-$hs=@{}; Get-Content (Join-Path $PSScriptRoot 'design-final\hashes.txt')|%{ $p=$_ -split '=',2; $hs[$p[0]]=$p[1] }
+$hs=@{}; Get-Content (Join-Path (Join-Path $PSScriptRoot 'design-final') 'hashes.txt')|%{ $p=$_ -split '=',2; $hs[$p[0]]=$p[1] }
 if((Get-FileHash (Join-Path $PSScriptRoot 'pi-template.html') -Algorithm SHA256).Hash -ne $hs['pitemplate'] -or (Get-FileHash $logoFile -Algorithm SHA256).Hash -ne $hs['logo']){ throw "PI design changed: pi-template.html / assets\logo.jpg differ from the approved design in design-final\. Restore from design-final\*.FINAL.* or update design-final\hashes.txt." }
 $html=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'pi-template.html'),[Text.Encoding]::UTF8)
 foreach($key in $pmap.Keys){ $html=$html.Replace("{{$key}}","$($pmap[$key])") }

@@ -1,4 +1,5 @@
 .env
 .DS_Store
+.github/mcp.json
 .github/skills/kpi-report/out/
 *.bak

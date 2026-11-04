@@ -1,0 +1,2 @@
+# Keep bytes identical on every OS: the design lock compares SHA256 hashes of these files.
+.github/skills/kpi-report/** -text

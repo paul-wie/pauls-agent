@@ -22,7 +22,7 @@
       ]
     },
     "mcp-atlassian": {
-      "command": "podman",
+      "command": "__RUNTIME__",
       "args": [
         "run",
         "-i",
