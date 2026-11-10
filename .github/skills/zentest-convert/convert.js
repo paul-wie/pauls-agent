@@ -16,7 +16,7 @@ if (!featureFile) {
 }
 const featureDir = path.dirname(path.resolve(featureFile));
 const featureName = path.basename(featureFile).replace(/\.feature$/i, "");
-const propsFile = opt("--props", path.join(featureDir, "en_GB.properties"));
+const propsFile = opt("--props", path.join(__dirname, "en_GB.properties"));
 const outDir = opt("--out", path.join(featureDir, featureName));
 const baseUrl = opt("--base-url", "https://ppntest.porsche.com/");
 

@@ -4,7 +4,7 @@ Wandelt eine Cucumber-`.feature`-Datei in einzelne, saubere `.txt`-Testfaelle um
 
 ## Voraussetzungen
 - Node.js (Befehl `node` muss funktionieren).
-- Die `.feature`-Datei und die Translation-Datei `en_GB.properties` im selben Ordner (sonst Pfad mit `--props` angeben).
+- Die `.feature`-Datei. Die Translation-Datei `en_GB.properties` liegt bereits im Skill-Ordner (mit `--props` kann eine andere angegeben werden, z. B. eine neuere Version; dann die Datei im Skill-Ordner ersetzen).
 
 ## Benutzung
 
@@ -21,7 +21,7 @@ Optionen:
 
 | Option | Bedeutung | Standard |
 |---|---|---|
-| `--props <datei>` | Translation-Datei | `en_GB.properties` neben der Feature-Datei |
+| `--props <datei>` | Translation-Datei | `en_GB.properties` im Skill-Ordner |
 | `--out <ordner>` | Zielordner | Unterordner mit dem Namen der Feature-Datei |
 | `--base-url <url>` | URL im Login-Step | `https://ppntest.porsche.com/` |
 

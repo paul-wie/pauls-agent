@@ -16,7 +16,7 @@ Ausgabe: neuer Ordner `<feature-name>\` mit **einer .txt pro Szenario**, nur Ste
 ```powershell
 node .github\skills\zentest-convert\convert.js "<pfad>\02_215EditUser.feature" [--props "<pfad>\en_GB.properties"] [--out "<ordner>"] [--base-url "https://ppntest.porsche.com/"]
 ```
-Defaults: `--props` = `en_GB.properties` im Ordner der Feature-Datei; `--out` = Unterordner mit dem Namen der Feature-Datei; `--base-url` = `https://ppntest.porsche.com/`.
+Defaults: `--props` = `en_GB.properties` im Skill-Ordner (mitgeliefert); `--out` = Unterordner mit dem Namen der Feature-Datei; `--base-url` = `https://ppntest.porsche.com/`.
 Die Zahlen/Texte kommen nur aus dem Script, nie von Hand aendern. Die Originaldateien werden nie veraendert.
 
 ## Regeln (vom Nutzer festgelegt)
