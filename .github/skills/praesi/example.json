@@ -1,0 +1,31 @@
+{
+  "title": "Beispiel-Praesentation",
+  "eyebrow": "Team Update",
+  "lang": "de",
+  "slides": [
+    {
+      "type": "cards",
+      "heading": "Zahlen auf einen Blick",
+      "cards": [
+        { "label": "Delivered", "value": "6", "unit": "SP", "detail": "3 Tickets (2 Story, 1 Task)", "info": "Reached Technical Review within the sprint." },
+        { "label": "Velocity", "value": "0,08", "detail": "6 SP / 76 Personentage", "badge": "laufender Sprint", "badgeType": "warn" },
+        { "label": "Committed", "value": "58", "unit": "SP", "detail": "Ratio **0,10**" }
+      ]
+    },
+    {
+      "type": "bullets",
+      "heading": "Kernpunkte",
+      "bullets": [
+        "Sprint laeuft noch, Leftovers **n/a**",
+        { "text": "Zwei Stories nachtraeglich hinzugekommen", "sub": ["4 SP insgesamt", "noch kein Technical Review"] }
+      ]
+    },
+    {
+      "type": "table",
+      "heading": "Technical Review",
+      "columns": ["Gruppe", "Erreicht", "Gesamt"],
+      "rows": [["Planned", "2", "16"], ["Added", "0", "2"]]
+    },
+    { "type": "text", "heading": "Fazit", "text": "Der Sprint ist am Anfang. Die Zahlen sind ein **Zwischenstand**." }
+  ]
+}

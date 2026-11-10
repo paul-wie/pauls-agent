@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #3a3d43; --card: #f3f3f5; --card-hover: #ffffff;
+    --border: rgba(255,255,255,.14); --text: #f4f4f5; --muted: #9a9ca3; --faint: #6b6d74;
+    --red: #e4002b; --green: #3ddc97; --amber: #ffb547; --on-card: #16171a; --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { color-scheme: dark; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+  body {
+    font-family: "Porsche Next TT", "Porsche Next", Arial, Helvetica, sans-serif; color: var(--text); line-height: 1.4;
+    background:
+      radial-gradient(1000px 600px at 85% -10%, rgba(228,0,43,.20), transparent 60%),
+      radial-gradient(1000px 600px at 10% 0%, rgba(190,200,220,.28), transparent 60%),
+      linear-gradient(180deg, #4a4d54 0%, var(--bg) 60%, #2f3136 100%);
+    background-attachment: fixed;
+  }
+  .stage { height: 100vh; display: flex; align-items: center; justify-content: center; scroll-snap-align: start; }
+  .frame { width: calc(1920px * var(--s, 1)); height: calc(1080px * var(--s, 1)); position: relative; overflow: hidden; flex: none; }
+  .slide {
+    width: 1920px; height: 1080px; padding: 110px 120px 120px; transform: scale(var(--s, 1)); transform-origin: top left;
+    display: flex; flex-direction: column; justify-content: center; position: relative;
+  }
+  .logo { height: 22px; display: block; }
+  .slide-top { position: absolute; top: 40px; left: 0; right: 0; display: flex; justify-content: center; }
+  .slide-foot {
+    position: absolute; left: 120px; right: 120px; bottom: 32px; padding-top: 14px;
+    border-top: 1px solid var(--border); display: flex; align-items: center; gap: 18px;
+    font-size: 14px; color: #b5b7be;
+  }
+  .slide-foot .sep { opacity: .5; }
+  .slide-foot .topic { margin-left: auto; color: #e4e5e8; font-weight: 700; }
+  .title-slide { align-items: center; text-align: center; }
+  .eyebrow { font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: #c5c7cd; margin-bottom: 14px; }
+  h1 { font-size: 56px; font-weight: 700; letter-spacing: -.01em; }
+  h1 span { color: #ff2a4d; }
+  h2 {
+    font-size: 16px; letter-spacing: .16em; text-transform: uppercase; color: #d6d8dd; font-weight: 700;
+    margin-bottom: 28px; display: flex; align-items: center; gap: 10px;
+  }
+  h2::before { content: ""; width: 18px; height: 2px; background: var(--red); }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 22px; }
+  .card {
+    position: relative; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 26px 28px; color: var(--on-card); --muted: #62646b; --border: rgba(0,0,0,.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,.28); transition: background .2s, transform .2s;
+  }
+  .card:hover { background: var(--card-hover); transform: translateY(-3px); }
+  .card.hero { border-top: 4px solid var(--red); }
+  .label { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .value { font-size: 68px; font-weight: 700; letter-spacing: -.03em; margin: 16px 0 8px; line-height: 1; display: flex; align-items: baseline; gap: 10px; }
+  .value small { font-size: 19px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+  .detail { font-size: 16px; color: #3d3f45; }
+  .badge { display: inline-block; font-size: 14px; font-weight: 700; padding: 5px 12px; border-radius: 999px; margin-top: 10px; }
+  .badge.good { background: rgba(20,160,100,.14); color: #0c8a55; }
+  .badge.warn { background: rgba(230,140,0,.16); color: #b36b00; }
+  .info { position: relative; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); color: var(--muted); font-size: 14px; font-style: normal; display: inline-flex; align-items: center; justify-content: center; cursor: help; flex: none; letter-spacing: 0; text-transform: none; }
+  .info:hover { color: #fff; background: var(--on-card); }
+  .info .tip { position: absolute; right: -8px; top: 36px; width: 300px; z-index: 10; background: #1b1c20; border-radius: 12px; padding: 14px 16px; font-size: 14px; line-height: 1.5; color: #e4e5e8; text-align: left; font-weight: 400; opacity: 0; visibility: hidden; transition: .15s; }
+  .info:hover .tip { opacity: 1; visibility: visible; }
+  ul.points { list-style: none; font-size: 26px; line-height: 1.5; }
+  ul.points li { padding-left: 28px; position: relative; margin-bottom: 14px; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: .62em; width: 12px; height: 2px; background: var(--red); }
+  ul.points ul { list-style: none; font-size: 20px; color: #c5c7cd; margin-top: 8px; }
+  ul.points ul li { margin-bottom: 6px; }
+  .text { font-size: 26px; line-height: 1.6; max-width: 1100px; }
+  table { border-collapse: collapse; width: 100%; font-size: 18px; background: var(--card); color: var(--on-card); border-radius: var(--radius); overflow: hidden; }
+  th { text-align: left; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: #62646b; padding: 16px 20px; border-bottom: 2px solid var(--red); }
+  td { padding: 14px 20px; border-bottom: 1px solid rgba(0,0,0,.08); }
+  tr:last-child td { border-bottom: 0; }
+  strong { font-weight: 700; }
+  .nav { position: fixed; right: 24px; bottom: 18px; font-size: 13px; color: #b5b7be; }
+  @page { size: 1920px 1080px; margin: 0; }
+  @media print {
+    html { scroll-snap-type: none; }
+    .stage { height: auto; display: block; break-after: page; }
+    .frame { width: 1920px !important; height: 1080px !important; }
+    .slide { transform: none !important; }
+    .nav { display: none; }
+  }
+</style>
+</head>
+<body>
+{{SLIDES}}
+<div class="nav" id="nav"></div>
+<script>
+  const slides = [...document.querySelectorAll('.stage')];
+  const nav = document.getElementById('nav');
+  let cur = 0;
+  const fit = () => document.documentElement.style.setProperty('--s', Math.min(innerWidth / 1920, innerHeight / 1080));
+  fit(); addEventListener('resize', fit);
+  const upd = () => { nav.textContent = (cur + 1) + ' / ' + slides.length + '  (← → ↑ ↓)'; };
+  const go = (i) => { cur = Math.max(0, Math.min(slides.length - 1, i)); slides[cur].scrollIntoView(); upd(); };
+  addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+  });
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { cur = slides.indexOf(e.target); upd(); } }), { threshold: 0.6 });
+  slides.forEach((s) => io.observe(s));
+  upd();
+</script>
+</body>
+</html>
